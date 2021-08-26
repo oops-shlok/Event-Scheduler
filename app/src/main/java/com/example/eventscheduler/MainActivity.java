@@ -1,7 +1,5 @@
 package com.example.eventscheduler;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -13,12 +11,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.sql.Time;
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private int notificationid=1;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private int notificationId = 1;
     private Button setBtn,cancelBtn;
     private TextView textView;
 
@@ -33,37 +33,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView=findViewById(R.id.textView);
     }
 
-
     @Override
-    public void onClick(View v) {
+    public void onClick(View view) {
+
         EditText editText = findViewById(R.id.edit);
         TimePicker timePicker = findViewById(R.id.time);
         Intent intent = new Intent(MainActivity.this, Time.class);
-        intent.putExtra("Notificationid",notificationid);
-        intent.putExtra("event",editText.getText().toString());
-        PendingIntent remIntent = PendingIntent.getBroadcast(MainActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        intent.putExtra("notificationId", notificationId);
+        intent.putExtra("event", editText.getText().toString());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                MainActivity.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT
+        );
 
-        switch(v.getId()){
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+
+        switch (view.getId()) {
             case R.id.set:
                 int hour = timePicker.getCurrentHour();
-                int min = timePicker.getCurrentMinute();
+                int minute = timePicker.getCurrentMinute();
 
-                Calendar start = Calendar.getInstance();
-                start.set(Calendar.HOUR_OF_DAY,hour);
-                start.set(Calendar.MINUTE,min);
-                start.set(Calendar.SECOND,0);
-                long settime = start.getTimeInMillis();
+                Calendar startTime = Calendar.getInstance();
+                startTime.set(Calendar.HOUR_OF_DAY, hour);
+                startTime.set(Calendar.MINUTE, minute);
+                startTime.set(Calendar.SECOND, 0);
+                long alarmStartTime = startTime.getTimeInMillis();
 
-                alarmManager.set(AlarmManager.RTC,settime,remIntent);
-
-                Toast.makeText(this, "Event Set", Toast.LENGTH_SHORT).show();
+                alarmManager.set(AlarmManager.RTC_WAKEUP, alarmStartTime, pendingIntent);
+                Toast.makeText(this, "Event Set!", Toast.LENGTH_SHORT).show();
                 textView.setText("Event Pending: " + editText.getText());
                 break;
+
             case R.id.cancel:
-                alarmManager.cancel(remIntent);
+                alarmManager.cancel(pendingIntent);
                 textView.setText("");
                 break;
         }
+
     }
 }
